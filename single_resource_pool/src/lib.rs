@@ -90,10 +90,10 @@ pub mod pool {
     }
 
     pub struct AssetPool {
-        /// Vaul containing the pooled token
+        /// Vault containing the pooled token
         liquidity: Vault,
 
-        /// Ammount taken from the pool and not yet returned
+        /// Amount taken from the pool and not yet returned
         external_liquidity_amount: Decimal,
 
         /// Flashloan term non-fungible resource manager
@@ -107,7 +107,7 @@ pub mod pool {
     }
 
     impl AssetPool {
-        pub fn instantiate_localy(
+        pub fn instantiate_locally(
             pool_res_address: ResourceAddress,
             owner_role: OwnerRole,
             component_rule: AccessRule,
@@ -173,7 +173,7 @@ pub mod pool {
             let component_rule = rule!(require(global_caller(component_address)));
 
             let (owned_pool_component, pool_unit_res_manager, flashloan_term_res_manager) =
-                AssetPool::instantiate_localy(pool_res_address, owner_role.clone(), component_rule);
+                AssetPool::instantiate_locally(pool_res_address, owner_role.clone(), component_rule);
 
             let pool_component = owned_pool_component
                 .prepare_to_globalize(owner_role)
@@ -202,8 +202,8 @@ pub mod pool {
             (self.liquidity.amount(), self.external_liquidity_amount)
         }
 
-        // Handle request to increse liquidity.
-        //  Add liquidity to the pool and uand get pool units back
+        // Handle request to increase liquidity.
+        // Add liquidity to the pool and get pool units back
         pub fn contribute(&mut self, assets: Bucket) -> Bucket {
             /* CHECK INPUT */
             assert!(
@@ -222,13 +222,13 @@ pub mod pool {
             pool_units
         }
 
-        // Handle request to decrese liquidity.
+        // Handle request to decrease liquidity.
         // Remove liquidity from the pool and and burn corresponding pool units
         pub fn redeem(&mut self, pool_units: Bucket) -> Bucket {
             /* INPUT CHECK */
             assert!(
                 pool_units.resource_address() == self.pool_unit_res_manager.address(),
-                "Pool unit resource address missmatch"
+                "Pool unit resource address mismatch"
             );
 
             let amount = (pool_units.amount() / self.unit_to_asset_ratio) //
@@ -329,7 +329,7 @@ pub mod pool {
                 "Not enough liquidity to supply this loan!"
             );
 
-            // Mint the loan term. it can be deposited in any caccount so, it will need to be return with the repayment and burn for the transaction to be able to suuceed
+            // Mint the loan term. it can be deposited to account so, it will need to be return with the repayment and burn for the transaction to be able to succeed
             let loan_terms =
                 self.flashloan_term_res_manager
                     .mint_ruid_non_fungible(FlashloanTerm {
